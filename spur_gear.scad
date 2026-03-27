@@ -130,14 +130,44 @@ module spur_gear(
     number_of_teeth,
     shift_coefficient
 ) {
+    key_shaft_d = 5;
+    key_width = 2;
+
     difference() {
         linear_extrude(thickness)
             spur_gear_base(module_val, pressure_angle, number_of_teeth, shift_coefficient);
-        /*
-        Key Shaft
-        */
+        translate([0, 0, thickness / 2])
+            union() {
+                key_shaft(key_shaft_d, thickness, key_width);
+                translate([key_shaft_d / 3, 0, 0])
+                    key(thickness, key_width);
+            }
     }
 }
+
+module key_shaft(
+    shaft_d, 
+    shaft_height, 
+    key_width
+) {
+    difference() {
+        cylinder(d = shaft_d, h = shaft_height, center = true);
+        translate([shaft_d / 3, 0, 0])
+            cube([key_width, key_width, shaft_height], center = true);
+    }
+}
+
+module key(
+    shaft_height, 
+    key_width
+) {
+    cube([key_width, key_width, shaft_height], center = true);
+}
+
+
+module positive_shifted_spur_gear() {}
+
+module negative_shifted_spur_gear() {}
 
 // ========== ASSEMBLY ========== //
 spur_gear(
