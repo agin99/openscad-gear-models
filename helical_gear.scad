@@ -126,7 +126,7 @@ module normal_helical_gear(
 
 // ========== ASSEMBLY ========== //
 //Left hand
-transverse_helical_gear(
+*transverse_helical_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
@@ -139,7 +139,7 @@ transverse_helical_gear(
 );
 
 //Right hand
-transverse_helical_gear(
+*transverse_helical_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
@@ -152,7 +152,7 @@ transverse_helical_gear(
 );
 
 //Left hand
-!normal_helical_gear(
+*normal_helical_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
@@ -165,7 +165,7 @@ transverse_helical_gear(
 );
 
 //Right hand
-normal_helical_gear(
+*normal_helical_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 

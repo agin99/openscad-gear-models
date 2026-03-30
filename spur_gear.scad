@@ -196,7 +196,7 @@ module profile_shifted_spur_gear(
 }
 
 // ========== ASSEMBLY ========== //
-spur_gear(
+*spur_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
@@ -207,7 +207,7 @@ spur_gear(
     key_width = 17 / 2
 );
 
-!profile_shifted_spur_gear(
+*profile_shifted_spur_gear(
     shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
@@ -218,13 +218,13 @@ spur_gear(
     key_width = 17 / 2
 );
 
-key_shaft(
+*key_shaft(
     shaft_d = 17,
     shaft_height = 40, 
     key_width = 16.75 / 2
 );
 
-key(
+*key(
     shaft_height = 20, 
     key_width = 16.75 / 2
 );

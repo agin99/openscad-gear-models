@@ -370,7 +370,7 @@ rack_width = 2.5;
     pa
 );
 
-dual_support_block(
+*dual_support_block(
     m,
     pa, 
     gear_z, 
