@@ -89,6 +89,33 @@ module worm_gear(
     }
 }
 
+module worm_gear_key_shaft(
+    m,
+    pa,
+    q,
+    n_turns,
+    n_starts,
+    key_shaft_d,
+    key_width
+) {
+    lead = PI * m * n_starts;
+    difference() {
+        worm_gear(
+            m,
+            pa,
+            q,
+            n_turns,
+            n_starts
+        );
+        translate([0, 0, lead * n_turns / 2])
+        union() {
+            key_shaft(key_shaft_d, lead * n_turns, key_width);
+            translate([key_shaft_d / 3, 0, 0])
+                key(lead * n_turns, key_width);
+        }
+    }
+}
+
 module worm_wheel(
     wheel_thickness,
     key_shaft_d, 
@@ -143,7 +170,7 @@ worm_gear(
     n_starts
 );
 
-!worm_wheel(
+worm_wheel(
     wheel_thickness,
     key_shaft_d,
     m,
@@ -151,4 +178,14 @@ worm_gear(
     q,
     n_starts,
     n_wheel
+);
+
+!worm_gear_key_shaft(
+    m, 
+    pa, 
+    q, 
+    n_turns,
+    n_starts,
+    key_shaft_d,
+    key_shaft_d / 2
 );
