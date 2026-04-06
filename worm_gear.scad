@@ -133,7 +133,6 @@ module worm_wheel(
     difference() {
         translate([0, 0, -wheel_thickness / 2])
             spur_gear(
-                shaft_d = 5.25, //Remove if using shaft key 
                 thickness = wheel_thickness, 
                 module_val = m, 
                 pressure_angle = pa, 

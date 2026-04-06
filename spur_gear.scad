@@ -37,6 +37,12 @@
 
 /*
 ===== Tooth Design: Involute =====
+The involute tooth profile is designed such that any point of contact between a conjugate pair of 
+    involute teeth results in perpendicular points of contact that are tangent to the base circle 
+    from which the teeth were defined. With this profile, line of action between the teeth of two 
+    meshed gears passes through the pitch point of the gear setup and obeys the Fundamental Law of 
+    Gearing.
+
 Steps: 
 1) Start at a position on the base circle and mark it as the starting point of the involute. 
 2) Move one pitch length along the circle. 
@@ -69,6 +75,39 @@ function get_involute_points(rb, max_t = 3, steps = 180) =
                 rb * (sin(t * 180/PI) - t * cos(t * 180/PI))  
             ]
     ]);
+
+/* 
+- Acts along pitch circle tangent. 
+- Captures the useful leverage (think Gibbs Free Energy)
+- Assumes unit torque
+*/
+function tangential_force(rb, pa) = cos(pa) / rb;
+
+/* 
+- Acts along the radius of the gear towards the center of the shaft. 
+- Captures the penalty of the pressure angle (think Entropy)
+- Assumes unit torque
+*/
+function radial_force(rb, pa) = sin(pa) / rb;
+
+/* 
+- Acts along the line of action
+- Captures the absolute contact load (think Enthalpy)
+- Assumes unit torque 
+
+Derivation of Resultant Force, F_{n} = \frac{1}{rb}
+
+F_{t} = \frac{cos(pa)}{rb}
+F_{r} = \frac{sin(pa)}{rb}
+F_{n}^{2} = F_{t}^{2} + F_{r}^{2}
+        = (\frac{cos(pa)}{rb})^{2} + (\frac{sin(pa)}{rb})^{2}
+        = (\frac{1}{rb})^{2} * [cos(pa)^{2} + sin(pa)^{2}]
+        = (\frac{1}{rb})^{2}
+
+F_{n} = sqrt{(\frac{1}{rb})^{2}}
+      = \frac{1}{rb} [QED]
+*/
+function resultant_force(rb) = 1 / rb;
 
 // ========== STRUCTURES ========== //
 // z - number of teeth
@@ -125,7 +164,6 @@ module spur_gear_base(
 }
 
 module spur_gear(
-    shaft_d,
     thickness,
     module_val, 
     pressure_angle,
@@ -135,7 +173,7 @@ module spur_gear(
     key_width
 ) {
     difference() {
-        linear_extrude(thickness)
+        linear_extrude(thickness, convexity = 10)
             spur_gear_base(module_val, pressure_angle, number_of_teeth, shift_coefficient);
         translate([0, 0, thickness / 2])
             union() {
@@ -144,6 +182,60 @@ module spur_gear(
                     key(thickness, key_width);
             }
     }
+}
+
+module spur_gear_force_overlay(
+    thickness,
+    module_val, 
+    pressure_angle,
+    number_of_teeth,
+    shift_coefficient,
+    key_shaft_d,
+    key_width
+) {
+    pitch_d = module_val * number_of_teeth;
+    pitch_r = pitch_d / 2;
+    addendum = module_val;
+    dedendum = 1.25 * module_val;
+    
+    addendum_r = pitch_r + (1 + shift_coefficient) * addendum;
+    root_r = pitch_r - dedendum + shift_coefficient * module_val;
+    base_r = pitch_r * cos(pressure_angle);
+
+    rotate([0, 0, (360 / 4) / number_of_teeth])
+        spur_gear(
+            thickness, 
+            module_val, 
+            pressure_angle, 
+            number_of_teeth, 
+            shift_coefficient,
+            key_shaft_d,
+            key_width
+        );
+
+    translate([module_val * number_of_teeth, 0, 0])
+        rotate([0, 0, (360 / 4) / number_of_teeth])
+            spur_gear(
+                thickness, 
+                module_val, 
+                pressure_angle, 
+                number_of_teeth, 
+                shift_coefficient,
+                key_shaft_d,
+                key_width
+            );
+
+    rotate([0, 0, -pressure_angle]) {
+        %color("blue", 0.5)
+            translate([base_r, -base_r])
+                linear_extrude(20)
+                    square([0.05, 2 * base_r]);
+    }
+
+    %color("green", 0.5)
+        translate([pitch_r, -pitch_r])
+            linear_extrude(20)
+                square([0.05, 2 * pitch_r]);
 }
 
 module key_shaft(
@@ -169,7 +261,6 @@ module key(
 // Positive: High-performance, high-strength, but "fussy" (requires high precision for initial mesh)
 // Negative: Low-performance, lower-strength, but "compliant" (high tolerance for automated assembly errors).
 module profile_shifted_spur_gear(
-    shaft_d,
     thickness,
     module_val, 
     pressure_angle,
@@ -184,7 +275,6 @@ module profile_shifted_spur_gear(
     assert(shift_coefficient > x_min, "Risk of undercutting, adjust shift_coefficient");
 
     spur_gear(
-        shaft_d = shaft_d, //Remove if using shaft key 
         thickness = thickness, 
         module_val = module_val, 
         pressure_angle = pressure_angle, 
@@ -197,7 +287,6 @@ module profile_shifted_spur_gear(
 
 // ========== ASSEMBLY ========== //
 *spur_gear(
-    shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
     pressure_angle = 20, 
@@ -208,7 +297,6 @@ module profile_shifted_spur_gear(
 );
 
 *profile_shifted_spur_gear(
-    shaft_d = 5.25, //Remove if using shaft key 
     thickness = 10, 
     module_val = 2, 
     pressure_angle = 20, 
@@ -227,4 +315,14 @@ module profile_shifted_spur_gear(
 *key(
     shaft_height = 20, 
     key_width = 16.75 / 2
+);
+
+spur_gear_force_overlay(
+    thickness = 10, 
+    module_val = 2, 
+    pressure_angle = 20, 
+    number_of_teeth = 24, 
+    shift_coefficient = 0,
+    key_shaft_d = 17,
+    key_width = 17 / 2
 );

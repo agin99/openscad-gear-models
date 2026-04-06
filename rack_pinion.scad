@@ -37,6 +37,9 @@ Therefore, the trapezoidal rack tooth profile is defined by:
 > b2 = πm / 2 + 2 * (1.25*m) * tan(pa)
 */
 
+// TODO: Base line in the rack gear to determine the line of action 
+// TODO: Mention why this change in the base line leads to straight line rack gear teeth 
+
 // ========== IMPORTS ========== //
 use <spur_gear.scad>;
 
@@ -271,7 +274,6 @@ module rack_pinion(
     translate([0, rack_thickness / 2, m * gear_z / 2 + PI * m])
         rotate([90, 0, 0])
             spur_gear(
-                shaft_d = 5.25, //Remove if using shaft key 
                 thickness = rack_thickness, 
                 module_val = m, 
                 pressure_angle = pa, 
@@ -316,7 +318,6 @@ module dual_rack_pinion(
     
     translate([0, ((m * gear_z + rack_gap) / 2 + rack_width + 1.25 * m), 0])
         spur_gear(
-            shaft_d = 5.25, //Remove if using shaft key 
             thickness = rack_thickness, 
             module_val = m, 
             pressure_angle = pa, 
@@ -328,7 +329,6 @@ module dual_rack_pinion(
 
     translate([0, -((m * gear_z + rack_gap) / 2 + rack_width + 1.25 * m), 0])
         spur_gear(
-            shaft_d = 5.25, //Remove if using shaft key 
             thickness = rack_thickness, 
             module_val = m, 
             pressure_angle = pa, 
@@ -395,7 +395,6 @@ rack_width = 2.5;
 );
 
 *spur_gear(
-    shaft_d = 5.25, //Remove if using shaft key 
     thickness = rack_thickness, 
     module_val = m, 
     pressure_angle = pa, 

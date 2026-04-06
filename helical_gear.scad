@@ -61,7 +61,6 @@ module transverse_helical_gear(
                         key(thickness, key_width);
                 }
                 spur_gear(
-                    shaft_d = 5.25, //Remove if using shaft key 
                     thickness = thickness, 
                     module_val = module_val, 
                     pressure_angle = transverse_pressure_angle, 
@@ -105,7 +104,6 @@ module normal_helical_gear(
                         key(thickness, key_width);
                 }
                 spur_gear(
-                    shaft_d = 5.25, //Remove if using shaft key 
                     thickness = thickness, 
                     module_val = module_val / cos(helix_angle), 
                     pressure_angle = transverse_pressure_angle, 
