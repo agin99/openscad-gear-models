@@ -191,7 +191,10 @@ module spur_gear_force_overlay(
     number_of_teeth,
     shift_coefficient,
     key_shaft_d,
-    key_width
+    key_width,
+    min_ft = 0,
+    max_fr = 1, 
+    max_fn = 1
 ) {
     pitch_d = module_val * number_of_teeth;
     pitch_r = pitch_d / 2;
@@ -201,6 +204,10 @@ module spur_gear_force_overlay(
     addendum_r = pitch_r + (1 + shift_coefficient) * addendum;
     root_r = pitch_r - dedendum + shift_coefficient * module_val;
     base_r = pitch_r * cos(pressure_angle);
+
+    assert(tangential_force(base_r, pressure_angle) > min_ft, "Tangential force too small.");
+    assert(radial_force(base_r, pressure_angle) < max_fr, "Radial force too large.");
+    assert(resultant_force(base_r) < max_fn, "Resultant force too large.");
 
     rotate([0, 0, (360 / 4) / number_of_teeth])
         spur_gear(
