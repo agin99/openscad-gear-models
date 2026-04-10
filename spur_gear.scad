@@ -52,7 +52,6 @@ Steps:
 6) Continue steps (4) and (5) until you've completed three cycles of this. 
 7) The involute can be drawn using the end of each line as reference points for the function. 
 */
-
 // ========== IMPORTS ========== //
 
 
@@ -60,6 +59,7 @@ Steps:
 $fn = 100;
 
 // ========== CONSTANTS ========== // 
+// TODO: Include relevant build items in stock
 
 
 // ========== VARIABLES ========== //
@@ -77,7 +77,7 @@ function get_involute_points(rb, max_t = 3, steps = 180) =
     ]);
 
 /* 
-- Acts along pitch circle tangent. 
+- Acts along the plane of action tangent to pitch cylinder. 
 - Captures the useful leverage (think Gibbs Free Energy)
 - Assumes unit torque
 */
@@ -91,7 +91,7 @@ function tangential_force(rb, pa) = cos(pa) / rb;
 function radial_force(rb, pa) = sin(pa) / rb;
 
 /* 
-- Acts along the line of action
+- Acts along the plane of action
 - Captures the absolute contact load (think Enthalpy)
 - Assumes unit torque 
 
@@ -235,13 +235,13 @@ module spur_gear_force_overlay(
     rotate([0, 0, -pressure_angle]) {
         %color("blue", 0.5)
             translate([base_r, -base_r])
-                linear_extrude(20)
+                linear_extrude(thickness)
                     square([0.05, 2 * base_r]);
     }
 
     %color("green", 0.5)
         translate([pitch_r, -pitch_r])
-            linear_extrude(20)
+            linear_extrude(thickness)
                 square([0.05, 2 * pitch_r]);
 }
 

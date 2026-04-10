@@ -262,14 +262,14 @@ module rack_pinion(
     bb_h
 ) {
     translate([0, rack_thickness / 2, rack_width / 2])
-    rotate([90, 0, 0])
-        rack_3D(
-            rack_thickness,
-            rack_width, 
-            m, 
-            rack_z, 
-            pa
-        );
+        rotate([90, 0, 0])
+            rack_3D(
+                rack_thickness,
+                rack_width, 
+                m, 
+                rack_z, 
+                pa
+            );
 
     translate([0, rack_thickness / 2, m * gear_z / 2 + PI * m])
         rotate([90, 0, 0])

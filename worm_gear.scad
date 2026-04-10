@@ -28,6 +28,7 @@ use <rack_pinion.scad>;
 $fn = 100;
 
 // ========== CONSTANTS ========== // 
+// TODO: Include relevant build items in stock
 
 
 // ========== VARIABLES ========== //
