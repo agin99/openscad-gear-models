@@ -7,10 +7,10 @@
     > Tooth Count (z) - Determines the amount of teeth on a gear
 
 - Compatibility Dependence: Right-Left Gear
-    > 
-
-- Parameters: 
-    > 
+    > Opposite Hand
+    > Module Value (m)
+    > Pressure Angle (pa)
+    > Helix Angle (ha)
 */
 
 // ========== IMPORTS ========== //
@@ -150,6 +150,53 @@ module helical_gear(
                     key(thickness, key_width);
             }
     }
+}
+
+module helical_gear_force_overlay(
+    thickness,
+    module_val, 
+    pressure_angle,
+    helix_angle,
+    number_of_teeth,
+    shift_coefficient,
+    key_shaft_d,
+    key_width
+) {
+    transverse_module_val = module_val / cos(helix_angle);
+    twist_angle = get_twist_angle(module_val, number_of_teeth, helix_angle, thickness);
+    transverse_pressure_angle = get_transverse_pressure_angle(pressure_angle, helix_angle);
+
+    difference() {
+        linear_extrude(
+            height = thickness, 
+            twist = twist_angle, 
+            convexity = 10
+        )
+        projection(cut = true)
+            union() {
+                translate([0, 0, thickness / 2])
+                union() {
+                    key_shaft(key_shaft_d, thickness, key_width);
+                    translate([key_shaft_d / 3, 0, 0])
+                        key(thickness, key_width);
+                }
+                spur_gear(
+                    thickness = thickness, 
+                    module_val = transverse_module_val, 
+                    pressure_angle = transverse_pressure_angle, 
+                    number_of_teeth = number_of_teeth, 
+                    shift_coefficient = 0,
+                    key_shaft_d = key_shaft_d,
+                    key_width = key_width
+                );
+            }
+        translate([0, 0, thickness / 2])
+            union() {
+                key_shaft(key_shaft_d, thickness, key_width);
+                translate([key_shaft_d / 3, 0, 0])
+                    key(thickness, key_width);
+            }
+    }
 
     pitch_d = transverse_module_val * number_of_teeth;
     pitch_r = pitch_d / 2;
@@ -197,11 +244,6 @@ module helical_gear(
             translate([base_r, -pitch_r]) 
                 linear_extrude(thickness)
                     square([0.05, 2 * pitch_r]);
-        color("red")
-            translate([base_r, pitch_r * sin(transverse_pressure_angle), 0])
-                rotate([base_helix_angle, 0, 0]) 
-                    translate([0, 0, -thickness/2]) 
-                        cylinder(h = thickness * 2, r = 0.5);
     }
 
     /*

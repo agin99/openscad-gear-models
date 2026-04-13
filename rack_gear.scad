@@ -76,10 +76,12 @@ bb_6903_h = 7;
 
 // ========== LOGIC ========== //
 /*
-The rack gear works to convert rotational motion into linear motion. Due to the pressure angle 
+The rack gear works to convert rotational motion into linear motion.  
 */
 function radial_force(pa) = sin(pa);
+
 function tangential_force(pa) = cos(pa);
+
 function resultant_force() = 1;
 
 // ========== STRUCTURES ========== //
@@ -152,6 +154,37 @@ module rack_3D(
     }
 }
 
+module rack_3D_force_overlay(
+    rack_thickness,
+    rack_width,
+    m,
+    z, 
+    pa
+) {
+    pitch = PI * m;
+    %linear_extrude(height = rack_thickness) {
+        rack_2D(rack_width, m, z, pa);
+    }
+
+    /*
+        Forces: 
+        - Radial 
+        - Tangential 
+        - Resultant 
+    */
+    echo(pa);
+    translate([0, pitch, rack_thickness / 2]) {
+        vector_scale = 15;
+        color("blue") 
+            rotate([90, 0, 0]) cylinder(h = vector_scale * radial_force(pa), r = 0.5);
+        color("green") 
+            rotate([0, -90, 0]) cylinder(h = vector_scale * tangential_force(pa), r = 0.5);
+        color("purple")
+            rotate([0, -90, pa])
+                cylinder(h = vector_scale, r = 0.8);
+    }
+}
+
 // ========== BUILD ========== //
 
 // ========== ASSEMBLY ========== //
@@ -163,3 +196,11 @@ rack_z = 20;
 rack_gap = 10;
 rack_thickness = 10;
 rack_width = 2.5;
+
+rack_3D_force_overlay(
+    rack_thickness, 
+    rack_width,
+    m, 
+    rack_z,
+    pa
+);

@@ -209,28 +209,15 @@ module spur_gear_force_overlay(
     assert(radial_force(base_r, pressure_angle) < max_fr, "Radial force too large.");
     assert(resultant_force(base_r) < max_fn, "Resultant force too large.");
 
-    rotate([0, 0, (360 / 4) / number_of_teeth])
-        spur_gear(
-            thickness, 
-            module_val, 
-            pressure_angle, 
-            number_of_teeth, 
-            shift_coefficient,
-            key_shaft_d,
-            key_width
-        );
-
-    translate([module_val * number_of_teeth, 0, 0])
-        rotate([0, 0, (360 / 4) / number_of_teeth])
-            spur_gear(
-                thickness, 
-                module_val, 
-                pressure_angle, 
-                number_of_teeth, 
-                shift_coefficient,
-                key_shaft_d,
-                key_width
-            );
+    spur_gear(
+        thickness, 
+        module_val, 
+        pressure_angle, 
+        number_of_teeth, 
+        shift_coefficient,
+        key_shaft_d,
+        key_width
+    );
 
     rotate([0, 0, -pressure_angle]) {
         %color("blue", 0.5)
@@ -243,6 +230,23 @@ module spur_gear_force_overlay(
         translate([pitch_r, -pitch_r])
             linear_extrude(thickness)
                 square([0.05, 2 * pitch_r]);
+
+    /*
+        Forces: 
+        - Radial 
+        - Tangential 
+        - Resultant 
+    */
+    translate([pitch_r, 0, thickness / 2]) {
+        vector_scale = 15;
+        color("blue") 
+            rotate([0, -90, 0]) cylinder(h = vector_scale * base_r * radial_force(base_r, pressure_angle), r = 0.5);
+        color("green") 
+            rotate([-90, 0, 0]) cylinder(h = vector_scale * base_r * tangential_force(base_r, pressure_angle), r = 0.5);
+        color("purple")
+            rotate([-90, 0, pressure_angle])
+                cylinder(h = vector_scale, r = 0.8);
+    }
 }
 
 module key_shaft(
