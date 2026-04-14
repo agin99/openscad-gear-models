@@ -53,7 +53,7 @@ Steps:
 7) The involute can be drawn using the end of each line as reference points for the function. 
 */
 // ========== IMPORTS ========== //
-
+use <../openscad-motor-coupling/clamping_hub.scad>;
 
 // ========== GLOBAL ========== //
 $fn = 100;
@@ -61,6 +61,16 @@ $fn = 100;
 // ========== CONSTANTS ========== // 
 // TODO: Include relevant build items in stock
 
+// Servo MG90S 
+
+// Stepper NEMA 14 Dimensions
+nema_14_shaft_d = 5;
+
+// Stepper NEMA 17 Dimensions
+nema_17_shaft_d = 5;
+
+// Stepper NEMA 23 Dimensions
+nema_23_shaft_d = 8;
 
 // ========== VARIABLES ========== //
 
@@ -184,6 +194,38 @@ module spur_gear(
     }
 }
 
+module spur_gear_coupler(
+    thickness,
+    module_val, 
+    pressure_angle,
+    number_of_teeth,
+    shift_coefficient,
+    coupler_shaft_d, 
+    coupler_od, 
+    coupler_thickness,
+    coupler_slit_width, 
+    coupler_screw_d,
+    coupler_screw_l
+) {
+    clearance = 0.2; //Make sure this matches clamping hub clearance (merge eventually)
+    union() {
+        difference() {
+            linear_extrude(thickness, convexity = 10)
+                spur_gear_base(module_val, pressure_angle, number_of_teeth, shift_coefficient);    
+            cylinder(d = coupler_shaft_d + clearance, h = 100, center = true);
+        }
+        translate([0, 0, thickness + clamp_thickness / 2])
+            clamping_hub(
+                coupler_shaft_d, 
+                od, 
+                clamp_thickness,
+                slit_width,
+                screw_d,
+                screw_l
+            );
+    }
+}
+
 module spur_gear_force_overlay(
     thickness,
     module_val, 
@@ -209,7 +251,7 @@ module spur_gear_force_overlay(
     assert(radial_force(base_r, pressure_angle) < max_fr, "Radial force too large.");
     assert(resultant_force(base_r) < max_fn, "Resultant force too large.");
 
-    spur_gear(
+    %spur_gear(
         thickness, 
         module_val, 
         pressure_angle, 
@@ -307,28 +349,7 @@ module profile_shifted_spur_gear(
     key_width = 17 / 2
 );
 
-*profile_shifted_spur_gear(
-    thickness = 10, 
-    module_val = 2, 
-    pressure_angle = 20, 
-    number_of_teeth = 24, 
-    shift_coefficient = 0.25,
-    key_shaft_d = 17,
-    key_width = 17 / 2
-);
-
-*key_shaft(
-    shaft_d = 17,
-    shaft_height = 40, 
-    key_width = 16.75 / 2
-);
-
-*key(
-    shaft_height = 20, 
-    key_width = 16.75 / 2
-);
-
-spur_gear_force_overlay(
+*spur_gear_force_overlay(
     thickness = 10, 
     module_val = 2, 
     pressure_angle = 20, 
@@ -336,4 +357,24 @@ spur_gear_force_overlay(
     shift_coefficient = 0,
     key_shaft_d = 17,
     key_width = 17 / 2
+);
+
+od = 15; 
+clamp_thickness = 10;
+slit_width = 1;
+screw_d = 3;
+screw_l = 20;
+
+spur_gear_coupler(
+    thickness = 10, 
+    module_val = 2, 
+    pressure_angle = 20, 
+    number_of_teeth = 24, 
+    shift_coefficient = 0,
+    nema_23_shaft_d,
+    od,
+    clamp_thickness,
+    slit_width,
+    screw_d,
+    screw_l
 );
