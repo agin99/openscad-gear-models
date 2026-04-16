@@ -54,6 +54,7 @@ Steps:
 */
 // ========== IMPORTS ========== //
 use <../openscad-motor-coupling/clamping_hub.scad>;
+use <../openscad-motor-coupling/servo_horns_clean.scad>;
 
 // ========== GLOBAL ========== //
 $fn = 100;
@@ -226,6 +227,49 @@ module spur_gear_coupler(
     }
 }
 
+module spur_gear_horn_imprint(
+    type,
+    thickness,
+    module_val, 
+    pressure_angle,
+    number_of_teeth,
+    shift_coefficient,
+    nut_trap, // bool 
+    nut_trap_width,
+    nut_trap_height,
+    screw_to_nut_trap_separation
+) {
+    difference() {
+        linear_extrude(thickness, convexity = 10)
+            spur_gear_base(module_val, pressure_angle, number_of_teeth, shift_coefficient);
+        translate([0, 0, thickness - 2])
+        if(type == "s") {
+            single_horn_mask(
+                nut_trap,
+                nut_trap_width,
+                nut_trap_height,
+                screw_to_nut_trap_separation
+            );
+        }
+        else if(type == "d") {
+            double_horn_mask(
+                nut_trap,
+                nut_trap_width,
+                nut_trap_height,
+                screw_to_nut_trap_separation
+            );
+        }
+        else if(type == "c") {
+            cross_horn_mask(
+                nut_trap,
+                nut_trap_width,
+                nut_trap_height,
+                screw_to_nut_trap_separation
+            );
+        }
+    }
+}
+
 module spur_gear_force_overlay(
     thickness,
     module_val, 
@@ -365,7 +409,7 @@ slit_width = 1;
 screw_d = 3;
 screw_l = 20;
 
-spur_gear_coupler(
+*spur_gear_coupler(
     thickness = 10, 
     module_val = 2, 
     pressure_angle = 20, 
@@ -377,4 +421,43 @@ spur_gear_coupler(
     slit_width,
     screw_d,
     screw_l
+);
+
+*spur_gear_horn_imprint(
+    "s",
+    thickness = 10, 
+    module_val = 2, 
+    pressure_angle = 20, 
+    number_of_teeth = 24, 
+    shift_coefficient = 0,
+    nut_trap = true, // bool 
+    nut_trap_width = 1,
+    nut_trap_height = 5,
+    screw_to_nut_trap_separation = 5
+);
+
+*spur_gear_horn_imprint(
+    "d",
+    thickness = 10, 
+    module_val = 2, 
+    pressure_angle = 20, 
+    number_of_teeth = 24, 
+    shift_coefficient = 0,
+    nut_trap = true, // bool 
+    nut_trap_width = 1,
+    nut_trap_height = 5,
+    screw_to_nut_trap_separation = 5
+);
+
+!spur_gear_horn_imprint(
+    "c",
+    thickness = 10, 
+    module_val = 2, 
+    pressure_angle = 20, 
+    number_of_teeth = 24, 
+    shift_coefficient = 0,
+    nut_trap = true, // bool 
+    nut_trap_width = 1,
+    nut_trap_height = 5,
+    screw_to_nut_trap_separation = 5
 );
